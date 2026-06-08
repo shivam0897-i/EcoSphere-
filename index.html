@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="EcoSphere - Interactive Carbon Footprint Tracker SPA">
+  <meta name="description" content="EcoSphere - Interactive Carbon Footprint Tracker. Visualize, understand, and reduce your personal carbon emissions.">
+  <meta name="theme-color" content="#10b981">
   <title>EcoSphere | Carbon Footprint Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🌱</text></svg>" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-dark">
@@ -97,6 +99,14 @@
           </div>
           <p>Commit to taking public transit instead of driving. -40% Transit impact.</p>
         </button>
+
+        <button type="button" id="toggle-meatless-mondays" class="action-card" role="switch" aria-checked="false">
+          <div class="action-card-header">
+            <span class="action-icon" aria-hidden="true">🥗</span>
+            <h4>Meatless Mondays</h4>
+          </div>
+          <p>Go plant-based one day per week. -10% Diet impact.</p>
+        </button>
       </div>
     </section>
 
@@ -179,7 +189,7 @@
           <g id="balloons-layer">
             
             <!-- Balloon 1: Diet -->
-            <g id="balloon-diet" class="balloon carbon-balloon float-animation-diet" role="button" aria-label="Diet Footprint Balloon" tabindex="0">
+            <g id="balloon-diet" class="balloon carbon-balloon float-animation-diet" role="button" aria-label="Diet Footprint Balloon — click to toggle Meatless Mondays" tabindex="0">
               <line x1="250" y1="330" x2="250" y2="440" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" />
               <ellipse cx="250" cy="300" rx="30" ry="36" fill="url(#dietGrad)" />
               <polygon points="250 336 244 344 256 344" fill="var(--color-balloon-diet)" />
@@ -187,7 +197,7 @@
             </g>
 
             <!-- Balloon 2: Energy -->
-            <g id="balloon-energy" class="balloon carbon-balloon float-animation-energy" role="button" aria-label="Energy Footprint Balloon" tabindex="0">
+            <g id="balloon-energy" class="balloon carbon-balloon float-animation-energy" role="button" aria-label="Energy Footprint Balloon — click to toggle Renewable Energy" tabindex="0">
               <line x1="400" y1="270" x2="400" y2="400" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" />
               <ellipse cx="400" cy="230" rx="35" ry="42" fill="url(#energyGrad)" />
               <polygon points="400 272 393 280 407 280" fill="var(--color-balloon-energy)" />
@@ -195,7 +205,7 @@
             </g>
 
             <!-- Balloon 3: Transit -->
-            <g id="balloon-transit" class="balloon carbon-balloon float-animation-transit" role="button" aria-label="Transit Footprint Balloon" tabindex="0">
+            <g id="balloon-transit" class="balloon carbon-balloon float-animation-transit" role="button" aria-label="Transit Footprint Balloon — click to toggle Public Transit" tabindex="0">
               <line x1="550" y1="360" x2="550" y2="450" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" />
               <ellipse cx="550" cy="320" rx="28" ry="34" fill="url(#transitGrad)" />
               <polygon points="550 354 544 362 556 362" fill="var(--color-balloon-transit)" />
@@ -216,10 +226,13 @@
       
       <!-- Analytics Score & Chart -->
       <div class="analytics-wrapper" aria-label="Carbon Dashboard Analytics">
-        <div id="carbon-summary" class="metric-card">
+        <div id="carbon-summary" class="metric-card" data-score-level="heavy">
           <span class="metric-title">Total Footprint Score</span>
           <span id="total-score" class="metric-value">22.0</span>
           <span class="metric-unit">tons CO₂e</span>
+          <div id="score-context" class="score-context" aria-live="polite">
+            <!-- Rendered dynamically: equivalency context -->
+          </div>
           <div class="sub-metrics">
             <div>Diet: <span id="diet-score">4.5</span> t</div>
             <div>Energy: <span id="energy-score">7.5</span> t</div>
@@ -264,6 +277,11 @@
       </div>
     </section>
   </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>EcoSphere — Built with ♻️ for a greener planet. Zero dependencies. 100% client-side.</p>
+  </footer>
 
   <!-- Accessible Offscreen Screen Reader Live Region -->
   <div id="sr-announcer" class="sr-only" aria-live="polite" role="status"></div>
