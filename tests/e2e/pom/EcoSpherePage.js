@@ -25,6 +25,7 @@ export class EcoSpherePage {
     this.greenEnergyCardToggle = page.locator('#toggle-green-energy');
     this.thermostatCardToggle = page.locator('#toggle-smart-thermostat');
     this.publicTransitCardToggle = page.locator('#toggle-public-transit');
+    this.meatlessMondaysCardToggle = page.locator('#toggle-meatless-mondays');
 
     // Smart Heuristic Assistant / Chatbot
     this.assistantInput = page.locator('#assistant-input');
@@ -95,6 +96,9 @@ export class EcoSpherePage {
         break;
       case 'transit':
         await this.publicTransitCardToggle.click();
+        break;
+      case 'meatless-mondays':
+        await this.meatlessMondaysCardToggle.click();
         break;
       default:
         throw new Error(`Unknown card: ${cardId}`);

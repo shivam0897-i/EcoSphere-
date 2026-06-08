@@ -1,6 +1,8 @@
 /**
  * js/app.js
  * App Orchestrator. Binds UI event listeners, initializes modules, and subscribes views to the state.
+ * Features: score-aware chatbot with fuzzy intent matching, real-world equivalency context,
+ * dynamic score-level coloring, and accessible screen reader announcements.
  */
 
 import { StateManager } from './state.js';
@@ -12,11 +14,118 @@ document.addEventListener('DOMContentLoaded', () => {
   // Rounding helper to ensure consistent display and test values
   const round1 = (val) => (Math.round(val * 10) / 10).toFixed(1);
 
+  // ==================================================================
+  // Score Context — real-world equivalencies for storytelling
+  // ==================================================================
+  const WORLD_AVG = 4.8;   // World average tons CO₂e per person
+  const US_AVG   = 14.7;   // US average tons CO₂e per person
+
+  function getScoreContext(totalScore) {
+    const trees = Math.round(totalScore * 45); // ~45 trees per ton to offset
+    const flights = (totalScore / 0.9).toFixed(0); // ~0.9 tons per round-trip domestic flight
+    const vsWorld = ((totalScore / WORLD_AVG) * 100).toFixed(0);
+
+    let level = 'clean';
+    let emoji = '🌿';
+    let verdict = 'Excellent! You\'re well below the global average.';
+    
+    if (totalScore >= 22) {
+      level = 'heavy';
+      emoji = '🔴';
+      verdict = 'Above average. Significant room for improvement.';
+    } else if (totalScore >= 10) {
+      level = 'moderate';
+      emoji = '🟡';
+      verdict = 'Moderate impact. Small changes can make a big difference.';
+    }
+
+    return {
+      level,
+      html: `<span class="context-verdict">${emoji} ${verdict}</span>
+             <span class="context-detail">≈ ${trees} trees needed to offset · ${vsWorld}% of world avg · ~${flights} domestic flights</span>`
+    };
+  }
+
+  // ==================================================================
+  // Smart Chatbot — intent-based matching with fuzzy keyword support
+  // ==================================================================
+  const CHAT_INTENTS = [
+    {
+      patterns: [/transit|commut|driv|car|bus|train|transport|travel/i],
+      reply: (state) => `Your transit score is ${round1(state.scores.transitScore)} tons. You can reduce it by clicking the Public Transit action card below.`
+    },
+    {
+      patterns: [/energy|power|electric|heat|cool|thermostat|solar|renew|grid/i],
+      reply: (state) => `Your energy score is ${round1(state.scores.energyScore)} tons. Try switching to renewable energy or using a smart thermostat to lower it.`
+    },
+    {
+      patterns: [/diet|food|meat|vegan|vegetarian|plant|eat/i],
+      reply: (state) => `Your diet score is ${round1(state.scores.dietScore)} tons. Reducing red meat or enabling Meatless Mondays helps!`
+    },
+    {
+      patterns: [/dome|green.*house|plant|sapling|tree/i],
+      reply: () => `The green greenhouse dome represents your environmental health. Clean scores make saplings grow, while heavy scores wither them.`
+    },
+    {
+      patterns: [/balloon|float|rise|sink|pop|click/i],
+      reply: () => `Each balloon represents a carbon category (Diet, Energy, Transit). They rise when emissions are low and sink when high. Click a balloon to activate its linked action card — it'll "pop" and reduce that category's score. The position updates in real-time as your scores change!`
+    },
+    {
+      patterns: [/score|footprint|total|carbon|co2|emission|ton/i],
+      reply: (state) => `Your total carbon footprint is ${round1(state.scores.totalScore)} tons. Swapping actions and sliders will live-update the environment.`
+    },
+    {
+      patterns: [/reduc|lower|improv|help|tip|suggest|advice|how.*can|what.*do|save/i],
+      reply: (state) => {
+        const { dietScore, energyScore, transitScore } = state.scores;
+        const highest = Math.max(dietScore, energyScore, transitScore);
+        if (highest === transitScore) return `Your biggest impact area is Transit (${round1(transitScore)}t). Enable the Public Transit card for an instant -40% reduction, or reduce commute distance with the slider.`;
+        if (highest === energyScore) return `Energy is your top contributor (${round1(energyScore)}t). The Renewable Energy switch (-50%) and Smart Thermostat (-15%) stack cumulatively for up to -57.5% reduction!`;
+        return `Diet is your top contributor (${round1(dietScore)}t). Consider moving from omnivore to vegetarian (saves ~2t/year) or try Meatless Mondays for a 10% reduction.`;
+      }
+    },
+    {
+      patterns: [/compare|average|world|us|country|global|person/i],
+      reply: (state) => `Your footprint: ${round1(state.scores.totalScore)}t CO₂e/year.\n• World average: ${WORLD_AVG}t\n• US average: ${US_AVG}t\n• India average: 1.9t\n• EU average: 6.8t\nYou're at ${((state.scores.totalScore / WORLD_AVG) * 100).toFixed(0)}% of the global average.`
+    },
+    {
+      patterns: [/reset|start.*over|clear|default/i],
+      reply: () => `Click the "Reset" button in the top-right corner to restore all inputs and action cards to their default values. Your chat history will also be cleared.`
+    },
+    {
+      patterns: [/theme|dark|light|mode|color/i],
+      reply: () => `Click the sun/moon icon (⚙️) in the header to toggle between dark and light themes. Your preference is saved automatically!`
+    },
+    {
+      patterns: [/hello|hi|hey|greet|welcome/i],
+      reply: () => `Hey there! 👋 I'm your EcoSphere assistant. Ask me about your carbon score, how to reduce it, what the balloons mean, or how you compare to global averages.`
+    }
+  ];
+
+  function getChatReply(text, state) {
+    const query = text.toLowerCase().trim();
+    
+    for (const intent of CHAT_INTENTS) {
+      for (const pattern of intent.patterns) {
+        if (pattern.test(query)) {
+          return intent.reply(state);
+        }
+      }
+    }
+
+    // Fallback: match expected E2E text
+    return `I'm analyzing your request. Try asking about your transit score or the green dome!`;
+  }
+
+  // ==================================================================
   // 1. Initialize Visual Modules
+  // ==================================================================
   Visualizer.init('#eco-visualizer-svg');
   Charts.init('#chart-container');
 
+  // ==================================================================
   // 2. Bind Input Controls
+  // ==================================================================
   const dietSelect = document.getElementById('diet-select');
   const energyInput = document.getElementById('energy-input');
   const transitInput = document.getElementById('transit-input');
@@ -33,7 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (energyInput) energyInput.addEventListener('input', updateInputsFromDOM);
   if (transitInput) transitInput.addEventListener('input', updateInputsFromDOM);
 
+  // ==================================================================
   // 3. Bind Suggestion Action Cards
+  // ==================================================================
   const bindActionCard = (id, key) => {
     const card = document.getElementById(id);
     if (card) {
@@ -53,8 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
   bindActionCard('toggle-green-energy', 'greenEnergySwitch');
   bindActionCard('toggle-smart-thermostat', 'smartThermostat');
   bindActionCard('toggle-public-transit', 'publicTransit');
+  bindActionCard('toggle-meatless-mondays', 'meatlessMondays');
 
+  // ==================================================================
   // 4. Bind Theme Toggle
+  // ==================================================================
   const themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
@@ -63,7 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ==================================================================
   // 5. Bind Reset Control
+  // ==================================================================
   const resetBtn = document.getElementById('reset-state');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
@@ -76,7 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ==================================================================
   // 6. Bind Chatbot Form & Quick Prompts
+  // ==================================================================
   const chatForm = document.getElementById('chat-form');
   const chatInput = document.getElementById('chat-input');
 
@@ -91,26 +209,11 @@ document.addEventListener('DOMContentLoaded', () => {
       StateManager.addChatMessage('user', text);
       chatInput.value = '';
 
-      // Generate a responsive heuristic chatbot message
+      // Generate a responsive chatbot message
       setTimeout(() => {
-        let reply = "I'm analyzing your request. Try asking about your transit score or the green dome!";
-        const query = text.toLowerCase();
-        const currentState = StateManager.state;
-        
-        if (query.includes('transit') || query.includes('commute')) {
-          reply = `Your transit score is ${round1(currentState.scores.transitScore)} tons. You can reduce it by clicking the Public Transit action card below.`;
-        } else if (query.includes('energy') || query.includes('power')) {
-          reply = `Your energy score is ${round1(currentState.scores.energyScore)} tons. Try switching to renewable energy or using a smart thermostat to lower it.`;
-        } else if (query.includes('diet') || query.includes('food')) {
-          reply = `Your diet score is ${round1(currentState.scores.dietScore)} tons. Reducing red meat or enabling Meatless Mondays helps!`;
-        } else if (query.includes('dome') || query.includes('green greenhouse')) {
-          reply = "The green greenhouse dome represents your environmental health. Clean scores make saplings grow, while heavy scores wither them.";
-        } else if (query.includes('score') || query.includes('footprint')) {
-          reply = `Your total carbon footprint is ${round1(currentState.scores.totalScore)} tons. Swapping actions and sliders will live-update the environment.`;
-        }
-        
+        const reply = getChatReply(text, StateManager.state);
         StateManager.addChatMessage('assistant', reply);
-      }, 400);
+      }, 350);
     });
   }
 
@@ -124,7 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ==================================================================
   // 7. Subscribe Rendering Views to StateManager updates
+  // ==================================================================
   let lastScore = null;
 
   StateManager.subscribe((state) => {
@@ -152,18 +257,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (transitVal) transitVal.textContent = `${state.inputs.transit}%`;
 
     // C. Sync suggestion action cards aria states
-    const greenEnergyCard = document.getElementById('toggle-green-energy');
-    if (greenEnergyCard) {
-      greenEnergyCard.setAttribute('aria-checked', state.oneClickActions.greenEnergySwitch ? 'true' : 'false');
-    }
-    const thermostatCard = document.getElementById('toggle-smart-thermostat');
-    if (thermostatCard) {
-      thermostatCard.setAttribute('aria-checked', state.oneClickActions.smartThermostat ? 'true' : 'false');
-    }
-    const publicTransitCard = document.getElementById('toggle-public-transit');
-    if (publicTransitCard) {
-      publicTransitCard.setAttribute('aria-checked', state.oneClickActions.publicTransit ? 'true' : 'false');
-    }
+    const actionCards = {
+      'toggle-green-energy': 'greenEnergySwitch',
+      'toggle-smart-thermostat': 'smartThermostat',
+      'toggle-public-transit': 'publicTransit',
+      'toggle-meatless-mondays': 'meatlessMondays'
+    };
+    Object.entries(actionCards).forEach(([id, key]) => {
+      const card = document.getElementById(id);
+      if (card) {
+        card.setAttribute('aria-checked', state.oneClickActions[key] ? 'true' : 'false');
+      }
+    });
 
     // D. Sync numeric score display elements
     const totalScoreEl = document.getElementById('total-score');
@@ -178,7 +283,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const transitScoreEl = document.getElementById('transit-score');
     if (transitScoreEl) transitScoreEl.textContent = round1(state.scores.transitScore);
 
-    // E. Render SVG Visualizer, SVG Charts, and Assistant tips
+    // E. Update score level data attribute for color-coded metric card
+    const metricCard = document.getElementById('carbon-summary');
+    if (metricCard) {
+      const ctx = getScoreContext(state.scores.totalScore);
+      metricCard.setAttribute('data-score-level', ctx.level);
+      
+      const contextEl = document.getElementById('score-context');
+      if (contextEl) contextEl.innerHTML = ctx.html;
+    }
+
+    // F. Render SVG Visualizer, SVG Charts, and Assistant tips
     Visualizer.render(state);
     Charts.render(state);
 
@@ -193,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
 
-    // F. Sync Chat history message log
+    // G. Sync Chat history message log
     const chatLogs = document.getElementById('chat-logs');
     if (chatLogs) {
       chatLogs.innerHTML = '';
@@ -210,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // G. Accessibility Screen Reader announcement
+    // H. Accessibility Screen Reader announcement
     const currentScore = state.scores.totalScore;
     if (lastScore !== null && lastScore !== currentScore) {
       const announcer = document.getElementById('sr-announcer');
@@ -221,6 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
     lastScore = currentScore;
   });
 
+  // ==================================================================
   // 8. Bootstrap State (loads saved settings and triggers initial notify)
+  // ==================================================================
   StateManager.init();
 });
