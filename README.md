@@ -1,125 +1,150 @@
 # EcoSphere 🌱
 
-EcoSphere is an ultra-lightweight, high-performance client-side Single Page Application (SPA) designed to help individuals track, visualize, and reduce their daily carbon footprint. 
+> **Interactive Carbon Footprint Tracker** — Visualize, understand, and reduce your personal carbon emissions in real-time.
 
-Built using **semantic HTML5**, **custom CSS grid/flexbox layouts with vanilla CSS animations**, and **pure vanilla JavaScript**, EcoSphere delivers an engaging, modern user experience without the bloat of heavy framework runtimes. It is fully self-contained, offline-first, and conforms to strict accessibility (A11y) guidelines.
+EcoSphere is an ultra-lightweight, high-performance client-side Single Page Application (SPA) that helps individuals track, visualize, and reduce their daily carbon footprint through an immersive, data-driven experience.
 
----
-
-## 🌟 Key Features
-
-### 1. Interactive SVG Greenhouse Dome (Eco-Visualizer)
-- **Dynamic Feedback:** A central greenhouse environment changes its visual state based on the user's total carbon footprint score:
-  - **Clean Sky (`<10.0` tons):** Bright blue skies, a glowing yellow sun, and lush growing green saplings.
-  - **Moderate Sky (`10.0 - 21.9` tons):** Pale yellow sky, amber sun, and standard green saplings.
-  - **Heavy/Polluted Sky (`>=22.0` tons):** Dark slate-grey sky, dim red sun, withered brown plants, and active smokestacks emitting animated grey smoke.
-- **Interactive Carbon Balloons:** Floating SVG balloons representing Diet, Energy, and Transit. Users can click or press space/enter on balloons to "pop" them, which automatically triggers corresponding carbon-reduction actions.
-
-### 2. Context-Aware Smart Heuristic Assistant
-- **Lightweight Conversational Interface:** A client-side conversational chatbot that parses user inquiries.
-- **Targeted Heuristics:** The assistant inspects the user's current carbon profile to suggest tailored reduction tactics (e.g., if transit is the primary driver, it prompts public transit suggestions).
-- **Safe & Secure:** Prevents injection attacks (XSS) by using DOM text node insertion rather than raw `innerHTML` for message text rendering.
-
-### 3. One-Click Suggestion Cards & Analytics
-- **Instant Actions:** Toggle cards for high-impact actions (Switch to Renewable Energy, Smart Thermostat Scheduling, Public Transit Commute) that instantly recalculate footprints and pop matching balloons.
-- **Proportional Charts:** An inline, responsive SVG bar chart that updates dynamically to show carbon breakdowns.
-
-### 4. Accessibility & Performance
-- **Perfect Lighthouse Profile:** Semantic headings, skip-to-content links, and fully tab-navigable sliders, cards, and buttons.
-- **Screen Reader Announcements:** An `aria-live="polite"` announcer region automatically broadcasts score updates to screen-reader users upon any slider adjustments or action toggles.
-- **Zero-Dependency Core:** Loads in under **1.0 second** and fits under **2 MB** total repository size.
+Built with **semantic HTML5**, **glassmorphic CSS with custom animations**, and **pure vanilla JavaScript** — zero frameworks, zero backend, 100% offline-capable.
 
 ---
 
-## 📊 Carbon Calculation Logic & Coefficients
+## ✨ What Makes EcoSphere Different
 
-All calculations run client-side in [js/carbonCalculator.js](file:///C:/Users/shiva/OneDrive/Desktop/Challenge%203/js/carbonCalculator.js) based on three primary categories:
+### 🎈 Reactive SVG Balloon Visualizer
+Each carbon category (Diet, Energy, Transit) is represented by a floating balloon that **physically rises and sinks based on your actual score**:
+- **Low emissions** → balloons float high in a clear blue sky with golden sunlight
+- **Moderate emissions** → balloons drift mid-level under an amber sky
+- **High emissions** → balloons sink low as the sky darkens, smokestacks activate, and plants wither
 
-### 1. Dietary Habits
-- **Base Multiplier:** 
-  - **Vegan:** `1.5` tons $CO_2e$/year
-  - **Vegetarian:** `2.5` tons $CO_2e$/year
-  - **Omnivore:** `4.5` tons $CO_2e$/year
-- **Reduction Action (Meatless Mondays):** Reduces diet emissions by **10%** (factor of `0.9`).
+Click any balloon to "pop" it — triggering its linked reduction action. The entire scene transitions smoothly with CSS keyframe animations and custom properties.
 
-### 2. Household Energy
-- **Base Multiplier:** Scaled dynamically by the energy slider input ($0 - 100\%$), where:
-  $$\text{Energy Score} = \text{Input Level} \times 0.15$$
-- **Reduction Actions:**
-  - **Switch to Renewable Energy:** Reduces energy score by **50%** (factor of `0.5`).
-  - **Smart Thermostat Scheduling:** Reduces energy score by **15%** (factor of `0.85`).
-  - These factors apply **cumulatively** (e.g., toggling both results in a factor of $0.5 \times 0.85 = 0.425$).
+### 📊 Real-World Score Context
+Your total footprint isn't just a number — it's contextualized with:
+- 🌳 Trees needed to offset your emissions
+- ✈️ Equivalent domestic flights
+- 🌍 Percentage comparison to the global average (4.8t CO₂e/person)
+- Color-coded verdict (green/amber/red) with actionable guidance
 
-### 3. Transit & Commute
-- **Base Multiplier:** Scaled dynamically by the transit slider input ($0 - 100\%$), where:
-  $$\text{Transit Score} = \text{Input Level} \times 0.2$$
-- **Reduction Action (Public Transit Commute):** Reduces transit score by **40%** (factor of `0.6`).
+### 🤖 Intent-Aware Smart Assistant
+A client-side chatbot that uses **regex-based intent classification** across 11 topic patterns:
+- Understands natural questions about transit, energy, diet, balloons, comparisons, and reductions
+- Responds with **score-aware, personalized advice** (e.g., "Your transit is 45% of your total — try enabling Public Transit")
+- Graceful fallback that identifies your highest-impact category instead of a generic error
+
+### 🎯 One-Click Impact Cards
+Four toggle cards for instant carbon reduction:
+| Card | Effect | Category |
+|------|--------|----------|
+| 🔌 Renewable Energy | -50% Energy | Energy |
+| 🌡️ Smart Thermostat | -15% Energy | Energy |
+| 🚌 Public Transit | -40% Transit | Transit |
+| 🥗 Meatless Mondays | -10% Diet | Diet |
+
+Actions stack cumulatively (e.g., Renewable + Thermostat = -57.5% energy reduction).
+
+### 🎨 Premium Design
+- **Glassmorphism** panels with `backdrop-filter: blur()` and semi-transparent backgrounds
+- **Inter** font family via Google Fonts for crisp, modern typography
+- **Micro-animations**: logo pulse, message slide-in, card hover shimmer, balloon hover glow
+- **Dark/Light themes** with smooth color transitions and sticky frosted-glass header
+- Fully responsive across desktop, tablet, and mobile breakpoints
 
 ---
 
-## 🛠️ Folder Structure & Code Layout
+## 📊 Carbon Calculation Logic
+
+All calculations run client-side in [`carbonCalculator.js`](js/carbonCalculator.js):
+
+### Diet
+| Type | Base (tons CO₂e/year) |
+|------|----------------------|
+| Vegan | 1.5 |
+| Vegetarian | 2.5 |
+| Omnivore | 4.5 |
+
+**Meatless Mondays** reduces diet emissions by 10%.
+
+### Energy
+$$\text{Score} = \text{Slider Value} \times 0.15$$
+- **Renewable Energy**: -50%
+- **Smart Thermostat**: -15%
+- Both stack: $0.5 \times 0.85 = 0.425$ multiplier
+
+### Transit
+$$\text{Score} = \text{Slider Value} \times 0.2$$
+- **Public Transit**: -40%
+
+---
+
+## 🛠️ Architecture
 
 ```
-Challenge 3/
-├── index.html              # Main Single Page Application HTML5 structure
-├── style.css               # Design tokens, theme variables, glassmorphic layout, SVG styling & animations
+EcoSphere/
+├── index.html              # Semantic HTML5 SPA with inline SVG visualizer
+├── style.css               # Glassmorphic design system with CSS custom properties
 ├── js/
-│   ├── app.js              # Orchestrator: binds event listeners, bootstraps state, handles view subscriptions
-│   ├── state.js            # State store: Pub-Sub pattern managing inputs, scores, theme, and chat logs in localStorage
-│   ├── carbonCalculator.js # Footprint coefficients and calculation formulas
-│   ├── assistant.js        # Chatbot tip generation heuristics
-│   ├── visualizer.js       # SVG greenhouse glass dome and balloon styling orchestrator
-│   └── charts.js           # Dynamic SVG rendering of proportional category bar charts
+│   ├── app.js              # Orchestrator: event binding, chatbot, score context
+│   ├── state.js            # Pub-Sub state store with localStorage persistence
+│   ├── carbonCalculator.js # Pure-function emission calculator
+│   ├── assistant.js        # Heuristic tip generator
+│   ├── visualizer.js       # SVG balloon positioning & scene state manager
+│   └── charts.js           # Dynamic SVG bar chart renderer
 ├── tests/
-│   ├── unit/               # Native Node.js unit test suite (100% logic coverage)
-│   │   ├── setup.js        # Global localStorage environment mock
-│   │   ├── assistant.test.js
-│   │   ├── carbonCalculator.test.js
-│   │   └── state.test.js
-│   └── e2e/                # Playwright E2E browser automation test suites (Tiers 1-4)
-│       ├── pom/
-│       │   └── EcoSpherePage.js  # Page Object Model encapsulating selectors and helper actions
-│       ├── tier1-features/  # Feature verification & sanity checks
-│       ├── tier2-boundaries/# Edge inputs, limits, and tie-breakers
-│       ├── tier3-combinations/# Multi-feature interaction scenarios
-│       └── tier4-scenarios/ # Integrated real-world user flows
-├── package.json            # NPM build, run, and test script definitions
-└── playwright.config.js    # Playwright browser integration testing configuration
+│   ├── unit/               # Node.js native test runner (34+ tests)
+│   └── e2e/                # Playwright E2E browser automation (64+ tests)
+│       ├── pom/            # Page Object Model
+│       ├── tier1-features/ # Core feature verification
+│       ├── tier2-boundaries/# Edge cases & limits
+│       ├── tier3-combinations/# Multi-feature interactions
+│       └── tier4-scenarios/# Full user journey flows
+├── package.json
+└── playwright.config.js
 ```
+
+**Design Patterns Used:**
+- **Pub-Sub** (StateManager) for reactive data flow
+- **Page Object Model** for maintainable E2E tests
+- **Module Pattern** (ES modules) for clean separation of concerns
+- **CSS Custom Properties** for dynamic theming and score-responsive animations
 
 ---
 
-## 🧪 Testing & Verification
+## 🧪 Testing
 
-EcoSphere includes a comprehensive testing hierarchy with **100% pass rates**.
-
-### 1. Running Unit Tests
-Unit tests run using Node's native test runner (no extra test framework overhead):
+### Unit Tests
 ```bash
 npm run test:unit
 ```
+34+ tests covering calculator logic, state management, assistant heuristics, and adversarial edge cases.
 
-### 2. Running End-to-End (E2E) Tests
-E2E testing is powered by Playwright. The runner automatically launches a local server and runs tests across headless Chromium:
+### E2E Tests (Playwright)
 ```bash
-npm run test:e2e
+npm run test:e2e          # Headless Chromium
+npm run test:e2e:ui       # Interactive UI mode
 ```
+64+ tests across 4 tiers: features, boundaries, combinations, and full user scenarios.
 
-To run Playwright tests in interactive UI mode:
+---
+
+## 🚀 Run Locally
+
 ```bash
-npm run test:e2e:ui
+npm install
+npm run serve
+# Open http://127.0.0.1:8080/
 ```
 
 ---
 
-## 🚀 How to Run Locally
+## ♿ Accessibility
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-2. **Start the local server:**
-   ```bash
-   npm run serve
-   ```
-3. Open your browser and navigate to `http://127.0.0.1:8080/`.
+- Skip-to-content link for keyboard navigation
+- Full `aria-*` attributes on interactive elements (sliders, toggles, balloons)
+- `aria-live="polite"` announcer for screen reader score updates
+- Keyboard-navigable cards, balloons, and chat interface
+- Semantic heading hierarchy (`h1` → `h2` → `h3` → `h4`)
+- High-contrast color ratios in both themes
+
+---
+
+*Built with ♻️ for a greener planet.*
