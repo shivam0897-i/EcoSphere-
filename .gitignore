@@ -1,0 +1,21 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Playwright test reports and artifacts
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Subagent telemetry and config folders
+.agents/
+.gemini/
+.brain/
+.system_generated/

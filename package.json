@@ -1,0 +1,19 @@
+{
+  "name": "ecosphere-spa",
+  "version": "1.0.0",
+  "description": "EcoSphere client-side carbon footprint calculator and visualizer SPA",
+  "type": "module",
+  "scripts": {
+    "serve": "http-server . -p 8080 -c-1",
+    "test:unit": "node --test tests/unit/setup.js tests/unit/assistant.test.js tests/unit/carbonCalculator.test.js tests/unit/state.test.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "latest",
+    "@playwright/test": "latest",
+    "http-server": "latest"
+  }
+}
