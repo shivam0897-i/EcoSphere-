@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="EcoSphere - Interactive Carbon Footprint Tracker SPA">
+  <title>EcoSphere | Carbon Footprint Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-dark">
+  <!-- Skip link for keyboard accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header Section -->
+  <header class="app-header">
+    <div class="logo-area">
+      <span class="logo-icon" aria-hidden="true">🌱</span>
+      <h1>EcoSphere</h1>
+    </div>
+    <div class="header-controls">
+      <button id="reset-state" class="btn-secondary" aria-label="Reset Calculator to Defaults">
+        Reset
+      </button>
+      <button id="theme-toggle" class="btn-icon" aria-label="Switch Theme Mode" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="theme-sun-icon">
+          <circle cx="12" cy="12" r="5" />
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Grid -->
+  <main id="main-content" class="app-grid" tabindex="-1">
+    
+    <!-- Section 1: Inputs & One-Click Actions -->
+    <section class="panel panel-inputs" aria-labelledby="inputs-title">
+      <h2 id="inputs-title">Inputs & Actions</h2>
+      
+      <!-- Footprint inputs form -->
+      <form id="calculator-form" class="inputs-form" aria-label="Carbon Footprint Parameters">
+        
+        <!-- Diet Select -->
+        <div class="form-group">
+          <label for="diet-select">Dietary Habits</label>
+          <select id="diet-select" name="diet" aria-describedby="diet-help">
+            <option value="omnivore">Omnivore (Meat regularly)</option>
+            <option value="vegetarian">Vegetarian (No meat, dairy/eggs)</option>
+            <option value="vegan">Vegan (Strict plant-based)</option>
+          </select>
+          <small id="diet-help" class="form-help">Diet represents up to 25% of personal footprint.</small>
+        </div>
+
+        <!-- Energy Slider -->
+        <div class="form-group">
+          <div class="slider-label-row">
+            <label for="energy-input">Household Energy Consumption</label>
+            <span id="energy-val" aria-hidden="true">50%</span>
+          </div>
+          <input type="range" id="energy-input" name="energy" min="0" max="100" value="50" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        </div>
+
+        <!-- Transit Slider -->
+        <div class="form-group">
+          <div class="slider-label-row">
+            <label for="transit-input">Transit & Commute Distance</label>
+            <span id="transit-val" aria-hidden="true">50%</span>
+          </div>
+          <input type="range" id="transit-input" name="transit" min="0" max="100" value="50" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        </div>
+      </form>
+
+      <!-- Action Toggles -->
+      <div class="suggestions-container" aria-label="One-Click Green Actions">
+        <h3>One-Click Impact Cards</h3>
+        
+        <button type="button" id="toggle-green-energy" class="action-card" role="switch" aria-checked="false">
+          <div class="action-card-header">
+            <span class="action-icon" aria-hidden="true">🔌</span>
+            <h4>Switch to Renewable Energy</h4>
+          </div>
+          <p>Instantly switch power defaults to local solar/wind grid. -50% Energy impact.</p>
+        </button>
+
+        <button type="button" id="toggle-smart-thermostat" class="action-card" role="switch" aria-checked="false">
+          <div class="action-card-header">
+            <span class="action-icon" aria-hidden="true">🌡️</span>
+            <h4>Smart Thermostat Scheduling</h4>
+          </div>
+          <p>Optimize heating/cooling profiles automatically. -15% Energy impact.</p>
+        </button>
+
+        <button type="button" id="toggle-public-transit" class="action-card" role="switch" aria-checked="false">
+          <div class="action-card-header">
+            <span class="action-icon" aria-hidden="true">🚌</span>
+            <h4>Public Transit Commute</h4>
+          </div>
+          <p>Commit to taking public transit instead of driving. -40% Transit impact.</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- Section 2: Environmental SVG Visualizer -->
+    <section class="panel panel-visualizer" aria-label="EcoSphere Environment Status Simulator">
+      <div class="svg-wrapper">
+        <svg id="eco-visualizer-svg" viewBox="0 0 800 600" width="100%" height="100%" 
+             xmlns="http://www.w3.org/2000/svg" aria-label="EcoSphere Environment Status Visualizer" role="img">
+          
+          <defs>
+            <!-- Background Sky Linear Gradient -->
+            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" class="sky-stop-top" />
+              <stop offset="100%" class="sky-stop-bottom" />
+            </linearGradient>
+            
+            <!-- Balloon Gradients -->
+            <radialGradient id="dietGrad" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#a5b4fc" />
+              <stop offset="100%" stop-color="var(--color-balloon-diet)" />
+            </radialGradient>
+            
+            <radialGradient id="energyGrad" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#fef08a" />
+              <stop offset="100%" stop-color="var(--color-balloon-energy)" />
+            </radialGradient>
+
+            <radialGradient id="transitGrad" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#93c5fd" />
+              <stop offset="100%" stop-color="var(--color-balloon-transit)" />
+            </radialGradient>
+          </defs>
+
+          <!-- Sky Rect background -->
+          <rect id="svg-sky" width="800" height="600" fill="url(#skyGrad)" />
+
+          <!-- Celestial Body (Sun) -->
+          <circle id="celestial-body" cx="120" cy="100" r="45" fill="#fef08a" opacity="0.9" />
+
+          <!-- Industrial Smokestacks -->
+          <g class="smokestack-group" id="smokestacks">
+            <!-- Tall chimney -->
+            <rect x="680" y="380" width="35" height="120" fill="#475569" />
+            <rect x="675" y="370" width="45" height="10" fill="#334155" />
+            
+            <!-- Short chimney -->
+            <rect x="730" y="420" width="30" height="80" fill="#334155" />
+            <rect x="725" y="415" width="40" height="7" fill="#1e293b" />
+          </g>
+
+          <!-- Smoke Particle Emitter Group -->
+          <g class="smokestack-group" id="smoke-emitter">
+            <circle class="smoke-particle smoky-particle s1" cx="697" cy="360" r="12" />
+            <circle class="smoke-particle smoky-particle s2" cx="697" cy="360" r="16" />
+            <circle class="smoke-particle smoky-particle s3" cx="745" cy="405" r="10" />
+          </g>
+
+          <!-- Greenhouse Glass Dome Structure -->
+          <g id="greenhouse-structure">
+            <!-- Inner floor level -->
+            <rect x="100" y="495" width="600" height="25" fill="#1e3a1f" rx="8" />
+            
+            <!-- Forest / Saplings inside dome -->
+            <g id="forest-plants">
+              <path d="M 200 495 Q 185 450 215 420 Q 225 450 200 495 Z" fill="#10b981" />
+              <path d="M 400 495 Q 390 440 410 400 Q 425 440 400 495 Z" fill="#047857" />
+              <path d="M 600 495 Q 585 455 610 430 Q 620 455 600 495 Z" fill="#10b981" />
+            </g>
+            
+            <!-- Outer glass dome transparent curve -->
+            <path id="dome-glass-wall" d="M 100 500 A 300 300 0 0 1 700 500 Z" 
+                  fill="var(--dome-glass)" stroke="var(--dome-frame)" stroke-width="4" />
+            
+            <!-- Structural frame grid lines -->
+            <path d="M 400 200 L 400 500" stroke="var(--dome-frame)" stroke-width="2" />
+            <path d="M 217 290 Q 400 380 583 290" fill="none" stroke="var(--dome-frame)" stroke-width="2" />
+          </g>
+
+          <!-- Dynamic Carbon Balloons -->
+          <g id="balloons-layer">
+            
+            <!-- Balloon 1: Diet -->
+            <g id="balloon-diet" class="balloon carbon-balloon float-animation-diet" role="button" aria-label="Diet Footprint Balloon" tabindex="0">
+              <line x1="250" y1="330" x2="250" y2="440" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" />
+              <ellipse cx="250" cy="300" rx="30" ry="36" fill="url(#dietGrad)" />
+              <polygon points="250 336 244 344 256 344" fill="var(--color-balloon-diet)" />
+              <text x="250" y="305" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle" pointer-events="none">Diet</text>
+            </g>
+
+            <!-- Balloon 2: Energy -->
+            <g id="balloon-energy" class="balloon carbon-balloon float-animation-energy" role="button" aria-label="Energy Footprint Balloon" tabindex="0">
+              <line x1="400" y1="270" x2="400" y2="400" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" />
+              <ellipse cx="400" cy="230" rx="35" ry="42" fill="url(#energyGrad)" />
+              <polygon points="400 272 393 280 407 280" fill="var(--color-balloon-energy)" />
+              <text x="400" y="235" font-size="12" font-weight="bold" fill="#1e293b" text-anchor="middle" pointer-events="none">Energy</text>
+            </g>
+
+            <!-- Balloon 3: Transit -->
+            <g id="balloon-transit" class="balloon carbon-balloon float-animation-transit" role="button" aria-label="Transit Footprint Balloon" tabindex="0">
+              <line x1="550" y1="360" x2="550" y2="450" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3" />
+              <ellipse cx="550" cy="320" rx="28" ry="34" fill="url(#transitGrad)" />
+              <polygon points="550 354 544 362 556 362" fill="var(--color-balloon-transit)" />
+              <text x="550" y="325" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle" pointer-events="none">Transit</text>
+            </g>
+
+          </g>
+          
+          <!-- Ground Level -->
+          <rect x="0" y="520" width="800" height="80" fill="#334155" />
+        </svg>
+      </div>
+    </section>
+
+    <!-- Section 3: Analytics & Assistant Chatbot -->
+    <section class="panel panel-assistant" aria-labelledby="assistant-title">
+      <h2 id="assistant-title">Dashboard & Assistant</h2>
+      
+      <!-- Analytics Score & Chart -->
+      <div class="analytics-wrapper" aria-label="Carbon Dashboard Analytics">
+        <div id="carbon-summary" class="metric-card">
+          <span class="metric-title">Total Footprint Score</span>
+          <span id="total-score" class="metric-value">22.0</span>
+          <span class="metric-unit">tons CO₂e</span>
+          <div class="sub-metrics">
+            <div>Diet: <span id="diet-score">4.5</span> t</div>
+            <div>Energy: <span id="energy-score">7.5</span> t</div>
+            <div>Transit: <span id="transit-score">10.0</span> t</div>
+          </div>
+        </div>
+        <div id="chart-container" class="chart-container-class">
+          <!-- Dynamic SVG chart will render here -->
+        </div>
+      </div>
+
+      <!-- Heuristic Assistant Tips -->
+      <div id="assistant-tips" class="tips-container" aria-label="Personalized Eco Tips">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Chatbot Interface -->
+      <div class="chat-container" aria-label="Chatbot Interface">
+        <div class="chat-history" id="chat-history" role="log" aria-live="polite">
+          <div id="chat-logs" class="chat-logs-wrapper">
+            <!-- Messages rendered dynamically -->
+          </div>
+        </div>
+        
+        <!-- Interactive Prompt Suggestions -->
+        <div class="quick-prompts" aria-label="Quick questions">
+          <button class="btn-prompt" type="button">How can I reduce transit score?</button>
+          <button class="btn-prompt" type="button">What does the green dome mean?</button>
+        </div>
+
+        <!-- Chat Form -->
+        <form id="chat-form" class="chat-form">
+          <label for="chat-input" class="sr-only">Message the Assistant</label>
+          <input type="text" id="chat-input" placeholder="Ask about your carbon score..." required autocomplete="off">
+          <button type="submit" id="chat-send-btn" aria-label="Send message">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Accessible Offscreen Screen Reader Live Region -->
+  <div id="sr-announcer" class="sr-only" aria-live="polite" role="status"></div>
+
+  <!-- Bootstrapping Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
