@@ -9,21 +9,10 @@ import { StateManager } from './state.js';
 import { Visualizer } from './visualizer.js';
 import { Charts } from './charts.js';
 import { generateTips } from './assistant.js';
+import { round1 } from './utils.js';
+import { WORLD_AVG, US_AVG } from './constants.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Rounding helper to ensure consistent display and test values
-  // Defensive: handles null, undefined, NaN, or non-numeric inputs gracefully
-  const round1 = (val) => {
-    const num = Number(val);
-    if (!Number.isFinite(num)) return '0.0';
-    return (Math.round(num * 10) / 10).toFixed(1);
-  };
-
-  // ==================================================================
-  // Score Context — real-world equivalencies for storytelling
-  // ==================================================================
-  const WORLD_AVG = 4.8;   // World average tons CO₂e per person
-  const US_AVG   = 14.7;   // US average tons CO₂e per person
 
   function getScoreContext(totalScore) {
     if (!Number.isFinite(totalScore)) {

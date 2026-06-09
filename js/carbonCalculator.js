@@ -3,6 +3,8 @@
  * Calculates carbon footprint scores based on user inputs and active suggestions/actions.
  */
 
+import { CARBON_COEFFICIENTS } from './constants.js';
+
 /**
  * Calculates scores for diet, energy, and transit.
  * @param {Object} inputs - { diet: 'omnivore'|'vegetarian'|'vegan', energy: 0..100, transit: 0..100 }
@@ -10,47 +12,43 @@
  * @returns {Object} - { dietScore: num, energyScore: num, transitScore: num, totalScore: num }
  */
 export function calculateFootprint(inputs, actions = {}) {
-  // Diet: Vegan (1.5), Vegetarian (2.5), Omnivore (4.5)
-  let dietCoeff = 4.5;
+  // Diet: Vegan, Vegetarian, Omnivore
+  let dietCoeff = CARBON_COEFFICIENTS.diet.omnivore;
   if (inputs && inputs.diet) {
     // Normalize diet input to lowercase for case-insensitive matching
     const normalizedDiet = inputs.diet.toLowerCase();
     if (normalizedDiet === 'vegan') {
-      dietCoeff = 1.5;
+      dietCoeff = CARBON_COEFFICIENTS.diet.vegan;
     } else if (normalizedDiet === 'vegetarian') {
-      dietCoeff = 2.5;
+      dietCoeff = CARBON_COEFFICIENTS.diet.vegetarian;
     }
   }
   
   if (actions && actions.meatlessMondays) {
-    dietCoeff *= 0.9; // 10% reduction
+    dietCoeff *= CARBON_COEFFICIENTS.actions.meatlessMondaysFactor;
   }
   const dietScore = dietCoeff;
 
-  // Multipliers for scaling raw inputs (0-100) to tons CO₂e
-  const ENERGY_MULTIPLIER = 0.15;
-  const TRANSIT_MULTIPLIER = 0.20;
-
   // Energy: Base multiplier scaled by energy consumption input level (0-100)
   const rawEnergy = inputs && inputs.energy !== undefined ? Number(inputs.energy) : 50;
-  let energyMultiplier = rawEnergy * ENERGY_MULTIPLIER;
+  let energyMultiplier = rawEnergy * CARBON_COEFFICIENTS.energy.multiplier;
   
   if (actions) {
     if (actions.greenEnergySwitch) {
-      energyMultiplier *= 0.5; // 50% renewable switch saving
+      energyMultiplier *= CARBON_COEFFICIENTS.energy.greenEnergySwitchFactor;
     }
     if (actions.smartThermostat) {
-      energyMultiplier *= 0.85; // 15% smart thermostat saving
+      energyMultiplier *= CARBON_COEFFICIENTS.energy.smartThermostatFactor;
     }
   }
   const energyScore = energyMultiplier;
 
   // Transit: Base multiplier scaled by transit input level (0-100)
   const rawTransit = inputs && inputs.transit !== undefined ? Number(inputs.transit) : 50;
-  let transitMultiplier = rawTransit * TRANSIT_MULTIPLIER;
+  let transitMultiplier = rawTransit * CARBON_COEFFICIENTS.transit.multiplier;
   
   if (actions && actions.publicTransit) {
-    transitMultiplier *= 0.6; // 40% public transit saving
+    transitMultiplier *= CARBON_COEFFICIENTS.transit.publicTransitFactor;
   }
   const transitScore = transitMultiplier;
 

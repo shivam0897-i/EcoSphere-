@@ -3,6 +3,8 @@
  * Renders native SVG-based bar charts of the carbon footprint breakdown categories.
  */
 
+import { round1 } from './utils.js';
+
 export const Charts = {
   containerElement: null,
 
@@ -30,8 +32,6 @@ export const Charts = {
     const maxVal = Math.max(dietScore, energyScore, transitScore, 5) || 5;
     const baseWidth = 240; // Max visual width of the bar in px
     
-    const round1 = (val) => (Math.round(val * 10) / 10).toFixed(1);
-
     const dietWidth = parseFloat(Math.max((dietScore / maxVal) * baseWidth, 4).toFixed(1));
     const energyWidth = parseFloat(Math.max((energyScore / maxVal) * baseWidth, 4).toFixed(1));
     const transitWidth = parseFloat(Math.max((transitScore / maxVal) * baseWidth, 4).toFixed(1));
