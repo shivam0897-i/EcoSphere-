@@ -12,7 +12,12 @@ import { generateTips } from './assistant.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Rounding helper to ensure consistent display and test values
-  const round1 = (val) => (Math.round(val * 10) / 10).toFixed(1);
+  // Defensive: handles null, undefined, NaN, or non-numeric inputs gracefully
+  const round1 = (val) => {
+    const num = Number(val);
+    if (!Number.isFinite(num)) return '0.0';
+    return (Math.round(num * 10) / 10).toFixed(1);
+  };
 
   // ==================================================================
   // Score Context — real-world equivalencies for storytelling
@@ -232,14 +237,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==================================================================
   let lastScore = null;
 
-  StateManager.subscribe((state) => {
-    // A. Sync Theme on Body
+  // Individual render functions for maintainability and testability
+  function renderTheme(state) {
     document.body.className = state.theme === 'light' ? 'theme-light' : 'theme-dark';
     if (themeToggle) {
       themeToggle.setAttribute('aria-pressed', state.theme === 'light' ? 'true' : 'false');
     }
+  }
 
-    // B. Sync DOM Input values (for external or reset changes)
+  function renderInputValues(state) {
     if (dietSelect && dietSelect.value !== state.inputs.diet) {
       dietSelect.value = state.inputs.diet;
     }
@@ -250,13 +256,13 @@ document.addEventListener('DOMContentLoaded', () => {
       transitInput.value = state.inputs.transit;
     }
 
-    // Update range numeric text
     const energyVal = document.getElementById('energy-val');
     if (energyVal) energyVal.textContent = `${state.inputs.energy}%`;
     const transitVal = document.getElementById('transit-val');
     if (transitVal) transitVal.textContent = `${state.inputs.transit}%`;
+  }
 
-    // C. Sync suggestion action cards aria states
+  function renderActionCards(state) {
     const actionCards = {
       'toggle-green-energy': 'greenEnergySwitch',
       'toggle-smart-thermostat': 'smartThermostat',
@@ -269,31 +275,34 @@ document.addEventListener('DOMContentLoaded', () => {
         card.setAttribute('aria-checked', state.oneClickActions[key] ? 'true' : 'false');
       }
     });
+  }
 
-    // D. Sync numeric score display elements
+  function renderScores(state) {
     const totalScoreEl = document.getElementById('total-score');
     if (totalScoreEl) totalScoreEl.textContent = round1(state.scores.totalScore);
-    
+
     const dietScoreEl = document.getElementById('diet-score');
     if (dietScoreEl) dietScoreEl.textContent = round1(state.scores.dietScore);
-    
+
     const energyScoreEl = document.getElementById('energy-score');
     if (energyScoreEl) energyScoreEl.textContent = round1(state.scores.energyScore);
-    
+
     const transitScoreEl = document.getElementById('transit-score');
     if (transitScoreEl) transitScoreEl.textContent = round1(state.scores.transitScore);
+  }
 
-    // E. Update score level data attribute for color-coded metric card
+  function renderScoreContext(state) {
     const metricCard = document.getElementById('carbon-summary');
     if (metricCard) {
       const ctx = getScoreContext(state.scores.totalScore);
       metricCard.setAttribute('data-score-level', ctx.level);
-      
+
       const contextEl = document.getElementById('score-context');
       if (contextEl) contextEl.innerHTML = ctx.html;
     }
+  }
 
-    // F. Render SVG Visualizer, SVG Charts, and Assistant tips
+  function renderTips(state) {
     Visualizer.render(state);
     Charts.render(state);
 
@@ -307,8 +316,9 @@ document.addEventListener('DOMContentLoaded', () => {
         </ul>
       `;
     }
+  }
 
-    // G. Sync Chat history message log
+  function renderChat(state) {
     const chatLogs = document.getElementById('chat-logs');
     if (chatLogs) {
       chatLogs.innerHTML = '';
@@ -318,14 +328,15 @@ document.addEventListener('DOMContentLoaded', () => {
         div.textContent = msg.text;
         chatLogs.appendChild(div);
       });
-      
+
       const chatHistory = document.getElementById('chat-history');
       if (chatHistory) {
         chatHistory.scrollTop = chatHistory.scrollHeight;
       }
     }
+  }
 
-    // H. Accessibility Screen Reader announcement
+  function renderAccessibilityAnnouncement(state) {
     const currentScore = state.scores.totalScore;
     if (lastScore !== null && lastScore !== currentScore) {
       const announcer = document.getElementById('sr-announcer');
@@ -334,6 +345,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     lastScore = currentScore;
+  }
+
+  // Main subscriber that composes all render functions
+  StateManager.subscribe((state) => {
+    renderTheme(state);
+    renderInputValues(state);
+    renderActionCards(state);
+    renderScores(state);
+    renderScoreContext(state);
+    renderTips(state);
+    renderChat(state);
+    renderAccessibilityAnnouncement(state);
   });
 
   // ==================================================================
