@@ -26,6 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const US_AVG   = 14.7;   // US average tons CO₂e per person
 
   function getScoreContext(totalScore) {
+    if (!Number.isFinite(totalScore)) {
+      return {
+        level: 'unknown',
+        html: `<span class="context-verdict">⚠️ Score unavailable</span>
+               <span class="context-detail">Please check your inputs and try again.</span>`
+      };
+    }
+
     const trees = Math.round(totalScore * 45); // ~45 trees per ton to offset
     const flights = (totalScore / 0.9).toFixed(0); // ~0.9 tons per round-trip domestic flight
     const vsWorld = ((totalScore / WORLD_AVG) * 100).toFixed(0);

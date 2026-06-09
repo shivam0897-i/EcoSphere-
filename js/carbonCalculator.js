@@ -27,9 +27,13 @@ export function calculateFootprint(inputs, actions = {}) {
   }
   const dietScore = dietCoeff;
 
+  // Multipliers for scaling raw inputs (0-100) to tons CO₂e
+  const ENERGY_MULTIPLIER = 0.15;
+  const TRANSIT_MULTIPLIER = 0.20;
+
   // Energy: Base multiplier scaled by energy consumption input level (0-100)
   const rawEnergy = inputs && inputs.energy !== undefined ? Number(inputs.energy) : 50;
-  let energyMultiplier = rawEnergy * 0.15;
+  let energyMultiplier = rawEnergy * ENERGY_MULTIPLIER;
   
   if (actions) {
     if (actions.greenEnergySwitch) {
@@ -43,7 +47,7 @@ export function calculateFootprint(inputs, actions = {}) {
 
   // Transit: Base multiplier scaled by transit input level (0-100)
   const rawTransit = inputs && inputs.transit !== undefined ? Number(inputs.transit) : 50;
-  let transitMultiplier = rawTransit * 0.2;
+  let transitMultiplier = rawTransit * TRANSIT_MULTIPLIER;
   
   if (actions && actions.publicTransit) {
     transitMultiplier *= 0.6; // 40% public transit saving
