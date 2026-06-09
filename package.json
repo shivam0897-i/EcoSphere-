@@ -15,5 +15,8 @@
     "@axe-core/playwright": "latest",
     "@playwright/test": "latest",
     "http-server": "latest"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.4"
   }
 }

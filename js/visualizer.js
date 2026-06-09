@@ -5,16 +5,16 @@
  * Greenhouse dome, sky, smokestacks, and saplings respond to total score.
  */
 
-import { StateManager } from './state.js';
+import { StateManager } from "./state.js";
 
 export const Visualizer = {
   svgElement: null,
 
   // Balloon baseline Y positions (matching SVG markup)
   BALLOON_BASELINES: {
-    diet:    { cy: 300, maxRise: -120, maxSink: 60 },
-    energy:  { cy: 230, maxRise: -100, maxSink: 80 },
-    transit: { cy: 320, maxRise: -110, maxSink: 70 }
+    diet: { cy: 300, maxRise: -120, maxSink: 60 },
+    energy: { cy: 230, maxRise: -100, maxSink: 80 },
+    transit: { cy: 320, maxRise: -110, maxSink: 70 },
   },
 
   // Max individual score for normalization (energy=15, transit=20, diet=4.5)
@@ -22,9 +22,9 @@ export const Visualizer = {
 
   /**
    * Initializes the visualizer, selects the SVG, and binds interaction handlers.
-   * @param {string} [svgContainerId] 
+   * @param {string} [svgContainerId]
    */
-  init(svgContainerId = '#eco-visualizer-svg') {
+  init(svgContainerId = "#eco-visualizer-svg") {
     this.svgElement = document.querySelector(svgContainerId);
     this.bindClickEvents();
   },
@@ -33,24 +33,24 @@ export const Visualizer = {
    * Binds click and keyboard events to SVGs balloons.
    */
   bindClickEvents() {
-    ['diet', 'energy', 'transit'].forEach(cat => {
+    ["diet", "energy", "transit"].forEach((cat) => {
       const el = document.getElementById(`balloon-${cat}`);
       if (el) {
-        el.addEventListener('click', () => {
-          if (cat === 'diet') {
-            StateManager.toggleAction('meatlessMondays');
-          } else if (cat === 'energy') {
-            StateManager.toggleAction('greenEnergySwitch');
-          } else if (cat === 'transit') {
-            StateManager.toggleAction('publicTransit');
+        el.addEventListener("click", () => {
+          if (cat === "diet") {
+            StateManager.toggleAction("meatlessMondays");
+          } else if (cat === "energy") {
+            StateManager.toggleAction("greenEnergySwitch");
+          } else if (cat === "transit") {
+            StateManager.toggleAction("publicTransit");
           }
         });
-        
+
         // Accessibility: Keyboard trigger
-        el.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            el.dispatchEvent(new Event('click'));
+            el.dispatchEvent(new Event("click"));
           }
         });
       }
@@ -60,8 +60,8 @@ export const Visualizer = {
   /**
    * Maps a category score to a vertical Y offset for the balloon.
    * Low score → balloon rises (negative Y). High score → balloon sinks (positive Y).
-   * @param {string} category 
-   * @param {number} score 
+   * @param {string} category
+   * @param {number} score
    * @returns {number} Y offset in SVG units
    */
   computeBalloonOffset(category, score) {
@@ -78,41 +78,49 @@ export const Visualizer = {
 
   /**
    * Updates CSS state classes on the SVG root based on total score.
-   * @param {number} totalScore 
+   * @param {number} totalScore
    */
   updateVisuals(totalScore) {
     if (!this.svgElement) {
-      this.svgElement = document.querySelector('#eco-visualizer-svg');
+      this.svgElement = document.querySelector("#eco-visualizer-svg");
     }
     if (!this.svgElement) return;
 
     // Reset classes
-    this.svgElement.classList.remove('state-clean', 'state-moderate', 'state-heavy');
+    this.svgElement.classList.remove(
+      "state-clean",
+      "state-moderate",
+      "state-heavy",
+    );
 
     if (totalScore < 10) {
-      this.svgElement.classList.add('state-clean');
+      this.svgElement.classList.add("state-clean");
     } else if (totalScore < 22) {
-      this.svgElement.classList.add('state-moderate');
+      this.svgElement.classList.add("state-moderate");
     } else {
-      this.svgElement.classList.add('state-heavy');
+      this.svgElement.classList.add("state-heavy");
     }
   },
 
   /**
    * Updates balloon vertical positions using CSS custom properties.
    * The CSS keyframe animations reference these variables for translateY.
-   * @param {Object} scores 
+   * @param {Object} scores
    */
   updateBalloonPositions(scores) {
     if (!this.svgElement) return;
 
-    const categories = ['diet', 'energy', 'transit'];
-    const scoreKeys = { diet: 'dietScore', energy: 'energyScore', transit: 'transitScore' };
+    const categories = ["diet", "energy", "transit"];
+    const scoreKeys = {
+      diet: "dietScore",
+      energy: "energyScore",
+      transit: "transitScore",
+    };
 
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
       const score = scores[scoreKeys[cat]] || 0;
       const offset = this.computeBalloonOffset(cat, score);
-      
+
       // Update CSS custom property for the keyframe animation
       this.svgElement.style.setProperty(`--balloon-${cat}-y`, `${offset}px`);
     });
@@ -120,7 +128,7 @@ export const Visualizer = {
 
   /**
    * Renders full visualization updates from global state.
-   * @param {Object} state 
+   * @param {Object} state
    */
   render(state) {
     const total = state.scores.totalScore;
@@ -131,22 +139,22 @@ export const Visualizer = {
     const balloonsPopped = {
       diet: state.oneClickActions.meatlessMondays,
       energy: state.oneClickActions.greenEnergySwitch,
-      transit: state.oneClickActions.publicTransit
+      transit: state.oneClickActions.publicTransit,
     };
 
-    Object.keys(balloonsPopped).forEach(key => {
+    Object.keys(balloonsPopped).forEach((key) => {
       const balloon = document.getElementById(`balloon-${key}`);
       if (balloon) {
         if (balloonsPopped[key]) {
-          balloon.classList.add('popped');
-          balloon.setAttribute('aria-hidden', 'true');
-          balloon.setAttribute('tabindex', '-1');
+          balloon.classList.add("popped");
+          balloon.setAttribute("aria-hidden", "true");
+          balloon.setAttribute("tabindex", "-1");
         } else {
-          balloon.classList.remove('popped');
-          balloon.setAttribute('aria-hidden', 'false');
-          balloon.setAttribute('tabindex', '0');
+          balloon.classList.remove("popped");
+          balloon.setAttribute("aria-hidden", "false");
+          balloon.setAttribute("tabindex", "0");
         }
       }
     });
-  }
+  },
 };

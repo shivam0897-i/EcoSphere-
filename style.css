@@ -1,25 +1,27 @@
 /* style.css — EcoSphere Design System */
 
 /* Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 
 /* Core Design System Variables */
 :root {
-  --font-primary: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  
+  --font-primary:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+
   /* Shared Base Colors */
-  --color-healthy: #10b981;    /* Emerald green */
-  --color-warning: #f59e0b;    /* Warm amber */
-  --color-danger: #ef4444;     /* Warning red */
-  
-  --color-balloon-diet: #6366f1;   /* Indigo */
+  --color-healthy: #10b981; /* Emerald green */
+  --color-warning: #f59e0b; /* Warm amber */
+  --color-danger: #ef4444; /* Warning red */
+
+  --color-balloon-diet: #6366f1; /* Indigo */
   --color-balloon-energy: #eab308; /* Yellow */
-  --color-balloon-transit: #3b82f6;/* Blue */
-  
+  --color-balloon-transit: #3b82f6; /* Blue */
+
   --transition-speed: 0.3s;
   --glass-blur: blur(12px);
   --glass-saturate: saturate(180%);
-  
+
   /* Balloon vertical offsets (updated via JS based on score) */
   --balloon-diet-y: 0px;
   --balloon-energy-y: 0px;
@@ -37,10 +39,10 @@
   --text-secondary: #94a3b8;
   --border-color: rgba(148, 163, 184, 0.15);
   --border-glow: rgba(16, 185, 129, 0.2);
-  
+
   --chat-bubble-user: linear-gradient(135deg, #10b981, #059669);
   --chat-bubble-assistant: rgba(51, 65, 85, 0.7);
-  
+
   --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   --glow-healthy: 0 0 20px rgba(16, 185, 129, 0.15);
   --header-bg: rgba(15, 23, 42, 0.85);
@@ -57,10 +59,10 @@
   --text-secondary: #475569;
   --border-color: rgba(226, 232, 240, 0.8);
   --border-glow: rgba(16, 185, 129, 0.15);
-  
+
   --chat-bubble-user: linear-gradient(135deg, #10b981, #059669);
   --chat-bubble-assistant: rgba(241, 245, 249, 0.9);
-  
+
   --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   --glow-healthy: 0 0 20px rgba(16, 185, 129, 0.1);
   --header-bg: rgba(255, 255, 255, 0.85);
@@ -82,7 +84,9 @@ body {
   background-color: var(--bg-main);
   color: var(--text-primary);
   line-height: 1.6;
-  transition: background-color 0.5s ease, color 0.4s ease;
+  transition:
+    background-color 0.5s ease,
+    color 0.4s ease;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -146,7 +150,9 @@ body.theme-light {
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: background-color 0.4s ease, border-color 0.4s ease;
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease;
 }
 
 .logo-area {
@@ -161,8 +167,13 @@ body.theme-light {
 }
 
 @keyframes gentlePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .logo-area h1 {
@@ -272,7 +283,10 @@ body.theme-light {
   flex-direction: column;
   gap: 1.25rem;
   box-shadow: var(--card-shadow);
-  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 .panel:hover {
@@ -368,7 +382,9 @@ input[type="range"]::-webkit-slider-thumb {
   border: 3px solid var(--bg-card-solid);
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
@@ -436,13 +452,18 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .action-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.05), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(16, 185, 129, 0.05),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -458,12 +479,18 @@ input[type="range"]::-moz-range-thumb {
 
 .action-card[aria-checked="true"] {
   border-color: var(--color-healthy);
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(52, 211, 153, 0.05));
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.15), inset 0 0 0 1px rgba(16, 185, 129, 0.1);
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.08),
+    rgba(52, 211, 153, 0.05)
+  );
+  box-shadow:
+    0 0 16px rgba(16, 185, 129, 0.15),
+    inset 0 0 0 1px rgba(16, 185, 129, 0.1);
 }
 
 .action-card[aria-checked="true"]::after {
-  content: '✓';
+  content: "✓";
   position: absolute;
   top: 0.5rem;
   right: 0.75rem;
@@ -515,7 +542,7 @@ input[type="range"]::-moz-range-thumb {
   height: auto;
   max-height: 480px;
   border-radius: 12px;
-  filter: drop-shadow(0 4px 24px rgba(0,0,0,0.15));
+  filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.15));
   transition: filter 0.5s ease;
 }
 
@@ -543,13 +570,18 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .metric-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--color-healthy), var(--color-warning), var(--color-danger));
+  background: linear-gradient(
+    90deg,
+    var(--color-healthy),
+    var(--color-warning),
+    var(--color-danger)
+  );
   border-radius: 3px 3px 0 0;
 }
 
@@ -617,8 +649,12 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .context-verdict {
@@ -651,7 +687,11 @@ input[type="range"]::-moz-range-thumb {
    Heuristic Tips Container
    ========================================================================== */
 .tips-container {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(52, 211, 153, 0.03));
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.06),
+    rgba(52, 211, 153, 0.03)
+  );
   border: 1px solid rgba(16, 185, 129, 0.15);
   border-radius: 12px;
   padding: 1rem 1.125rem;
@@ -663,7 +703,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .tips-container::before {
-  content: '💡';
+  content: "💡";
   position: absolute;
   top: -10px;
   left: 1rem;
@@ -689,7 +729,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .tips-container .category-tip::before {
-  content: '›';
+  content: "›";
   position: absolute;
   left: 0.25rem;
   color: var(--color-healthy);
@@ -746,8 +786,14 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @keyframes messageSlide {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .chat-message.assistant {
@@ -881,8 +927,15 @@ input[type="range"]::-moz-range-thumb {
 
 /* Celestial body glow animation */
 @keyframes celestialGlow {
-  0%, 100% { filter: drop-shadow(0 0 3px #fef08a); opacity: 0.85; }
-  50% { filter: drop-shadow(0 0 12px #fef08a); opacity: 1; }
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px #fef08a);
+    opacity: 0.85;
+  }
+  50% {
+    filter: drop-shadow(0 0 12px #fef08a);
+    opacity: 1;
+  }
 }
 
 #celestial-body {
@@ -940,13 +993,21 @@ input[type="range"]::-moz-range-thumb {
   transition: fill 1s ease;
 }
 
-.smoke-particle.s1 { animation-delay: 0s; }
-.smoke-particle.s2 { animation-delay: 2s; }
-.smoke-particle.s3 { animation-delay: 4s; }
+.smoke-particle.s1 {
+  animation-delay: 0s;
+}
+.smoke-particle.s2 {
+  animation-delay: 2s;
+}
+.smoke-particle.s3 {
+  animation-delay: 4s;
+}
 
 /* Sapling scales inside glass dome */
 #forest-plants path {
-  transition: transform 1s ease, fill 1s ease;
+  transition:
+    transform 1s ease,
+    fill 1s ease;
   transform-origin: bottom;
 }
 
@@ -967,35 +1028,54 @@ input[type="range"]::-moz-range-thumb {
 
 /* Dome structural transitions */
 #dome-glass-wall {
-  transition: fill 1s ease, stroke 1s ease;
+  transition:
+    fill 1s ease,
+    stroke 1s ease;
 }
 
 /* ==========================================================================
    Balloon Animations — Score-Responsive Vertical Position
    ========================================================================== */
 @keyframes floatDiet {
-  0%, 100% { transform: translateY(var(--balloon-diet-y)) rotate(0deg); }
-  50% { transform: translateY(calc(var(--balloon-diet-y) - 12px)) rotate(1.5deg); }
+  0%,
+  100% {
+    transform: translateY(var(--balloon-diet-y)) rotate(0deg);
+  }
+  50% {
+    transform: translateY(calc(var(--balloon-diet-y) - 12px)) rotate(1.5deg);
+  }
 }
 
 @keyframes floatEnergy {
-  0%, 100% { transform: translateY(var(--balloon-energy-y)) rotate(0deg); }
-  50% { transform: translateY(calc(var(--balloon-energy-y) - 16px)) rotate(-1.5deg); }
+  0%,
+  100% {
+    transform: translateY(var(--balloon-energy-y)) rotate(0deg);
+  }
+  50% {
+    transform: translateY(calc(var(--balloon-energy-y) - 16px)) rotate(-1.5deg);
+  }
 }
 
 @keyframes floatTransit {
-  0%, 100% { transform: translateY(var(--balloon-transit-y)) rotate(0deg); }
-  50% { transform: translateY(calc(var(--balloon-transit-y) - 8px)) rotate(2deg); }
+  0%,
+  100% {
+    transform: translateY(var(--balloon-transit-y)) rotate(0deg);
+  }
+  50% {
+    transform: translateY(calc(var(--balloon-transit-y) - 8px)) rotate(2deg);
+  }
 }
 
 .balloon {
   cursor: pointer;
   outline: none;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  transition:
+    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s ease;
 }
 
 .balloon:hover {
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.3)) brightness(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)) brightness(1.1);
 }
 
 .balloon:focus-visible {
@@ -1019,9 +1099,18 @@ input[type="range"]::-moz-range-thumb {
 
 /* Pop animation */
 @keyframes popEffect {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.8; }
-  100% { transform: scale(0); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
 }
 
 .balloon.popped {

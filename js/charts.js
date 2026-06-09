@@ -3,26 +3,26 @@
  * Renders native SVG-based bar charts of the carbon footprint breakdown categories.
  */
 
-import { round1 } from './utils.js';
+import { round1 } from "./utils.js";
 
 export const Charts = {
   containerElement: null,
 
   /**
    * Initializes the chart module.
-   * @param {string} [containerId] 
+   * @param {string} [containerId]
    */
-  init(containerId = '#chart-container') {
+  init(containerId = "#chart-container") {
     this.containerElement = document.querySelector(containerId);
   },
 
   /**
    * Renders the bar chart with the updated state scores.
-   * @param {Object} state 
+   * @param {Object} state
    */
   render(state) {
     if (!this.containerElement) {
-      this.containerElement = document.querySelector('#chart-container');
+      this.containerElement = document.querySelector("#chart-container");
     }
     if (!this.containerElement) return;
 
@@ -31,10 +31,16 @@ export const Charts = {
     // Use a baseline scale factor. Maximum value maps to a proportional SVG width.
     const maxVal = Math.max(dietScore, energyScore, transitScore, 5) || 5;
     const baseWidth = 240; // Max visual width of the bar in px
-    
-    const dietWidth = parseFloat(Math.max((dietScore / maxVal) * baseWidth, 4).toFixed(1));
-    const energyWidth = parseFloat(Math.max((energyScore / maxVal) * baseWidth, 4).toFixed(1));
-    const transitWidth = parseFloat(Math.max((transitScore / maxVal) * baseWidth, 4).toFixed(1));
+
+    const dietWidth = parseFloat(
+      Math.max((dietScore / maxVal) * baseWidth, 4).toFixed(1),
+    );
+    const energyWidth = parseFloat(
+      Math.max((energyScore / maxVal) * baseWidth, 4).toFixed(1),
+    );
+    const transitWidth = parseFloat(
+      Math.max((transitScore / maxVal) * baseWidth, 4).toFixed(1),
+    );
 
     this.containerElement.innerHTML = `
       <svg viewBox="0 0 380 180" width="100%" height="100%" aria-label="Footprint Category Breakdown Chart" role="img" style="overflow: visible;">
@@ -67,5 +73,5 @@ export const Charts = {
         </g>
       </svg>
     `;
-  }
+  },
 };
