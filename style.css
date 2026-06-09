@@ -1030,6 +1030,28 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ==========================================================================
+   Focus States for Keyboard Navigation
+   ========================================================================== */
+input[type="range"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4);
+}
+
+.btn-secondary:focus-visible,
+.btn-icon:focus-visible,
+.btn-prompt:focus-visible {
+  outline: none;
+  border-color: var(--color-healthy);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+.action-card:focus-visible {
+  outline: none;
+  border-color: var(--color-healthy);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+/* ==========================================================================
    Footer
    ========================================================================== */
 .app-footer {

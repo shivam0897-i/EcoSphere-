@@ -140,9 +140,11 @@ export const Visualizer = {
         if (balloonsPopped[key]) {
           balloon.classList.add('popped');
           balloon.setAttribute('aria-hidden', 'true');
+          balloon.setAttribute('tabindex', '-1');
         } else {
           balloon.classList.remove('popped');
           balloon.setAttribute('aria-hidden', 'false');
+          balloon.setAttribute('tabindex', '0');
         }
       }
     });
