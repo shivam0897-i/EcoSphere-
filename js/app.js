@@ -153,13 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
       card.addEventListener('click', () => {
         StateManager.toggleAction(key);
       });
-      // Keyboard support
-      card.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          StateManager.toggleAction(key);
-        }
-      });
     }
   };
 
@@ -300,9 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderTips(state) {
-    Visualizer.render(state);
-    Charts.render(state);
-
     const tips = generateTips(state.inputs, state.scores);
     const tipsContainer = document.getElementById('assistant-tips');
     if (tipsContainer) {
@@ -351,6 +341,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderActionCards(state);
     renderScores(state);
     renderScoreContext(state);
+    Visualizer.render(state);
+    Charts.render(state);
     renderTips(state);
     renderChat(state);
     renderAccessibilityAnnouncement(state);
