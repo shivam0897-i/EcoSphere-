@@ -10,7 +10,7 @@ describe('StateManager', () => {
   beforeEach(() => {
     localStorage.clear();
     localStorage.shouldThrow = false;
-    StateManager.listeners = [];
+    StateManager.clearListeners();
     originalWarn = console.warn;
     originalError = console.error;
   });
@@ -202,5 +202,47 @@ describe('StateManager', () => {
 
     assert.strictEqual(StateManager.state.inputs.diet, 'omnivore');
     assert.strictEqual(StateManager.state.theme, 'dark');
+  });
+
+  test('init() should reject corrupted localStorage with string primitive', () => {
+    // Test that string primitives are rejected
+    localStorage.setItem('ecoSphereState', JSON.stringify("corrupt"));
+    StateManager.init();
+    
+    // Should fall back to defaults
+    assert.strictEqual(StateManager.state.inputs.diet, 'omnivore');
+    assert.strictEqual(StateManager.state.theme, 'dark');
+  });
+
+  test('init() should reject corrupted localStorage with array', () => {
+    // Test that arrays are rejected
+    localStorage.setItem('ecoSphereState', JSON.stringify(["array", "data"]));
+    StateManager.init();
+    
+    // Should fall back to defaults
+    assert.strictEqual(StateManager.state.inputs.diet, 'omnivore');
+    assert.strictEqual(StateManager.state.theme, 'dark');
+  });
+
+  test('clearListeners() should remove all registered listeners', () => {
+    let callCount1 = 0;
+    let callCount2 = 0;
+    
+    StateManager.subscribe(() => callCount1++);
+    StateManager.subscribe(() => callCount2++);
+    
+    // Both should have been called once on subscription
+    assert.strictEqual(callCount1, 1);
+    assert.strictEqual(callCount2, 1);
+    
+    // Clear all listeners
+    StateManager.clearListeners();
+    
+    // Trigger an update - listeners should not be called
+    StateManager.updateInputs({ diet: 'vegan' });
+    
+    // Call counts should remain at 1
+    assert.strictEqual(callCount1, 1);
+    assert.strictEqual(callCount2, 1);
   });
 });

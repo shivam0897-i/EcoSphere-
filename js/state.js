@@ -39,32 +39,75 @@ export const StateManager = {
   listeners: [],
 
   /**
-   * Initializes the state, loading from localStorage if present
+   * Validates that parsed state data is a valid object structure.
+   * @param {*} parsed - The parsed data to validate
+   * @returns {boolean} - True if valid object, not array or primitive
    */
-  init() {
+  isValidState(parsed) {
+    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed);
+  },
+
+  /**
+   * Merges loaded state with defaults to ensure all required fields exist.
+   * Handles schema changes by filling in missing fields from defaults.
+   * @param {Object} loaded - The loaded state from storage
+   * @returns {Object} - Merged state with all required fields
+   */
+  mergeWithDefaults(loaded) {
+    const merged = {
+      ...loaded,
+      inputs: { ...DEFAULT_STATE.inputs, ...loaded.inputs },
+      oneClickActions: { ...DEFAULT_STATE.oneClickActions, ...loaded.oneClickActions },
+      scores: { ...DEFAULT_STATE.scores, ...loaded.scores },
+    };
+
+    if (!merged.chatHistory) {
+      merged.chatHistory = JSON.parse(JSON.stringify(DEFAULT_STATE.chatHistory));
+    }
+    if (!merged.theme) {
+      merged.theme = DEFAULT_STATE.theme;
+    }
+
+    return merged;
+  },
+
+  /**
+   * Loads and validates state from localStorage with fallback to defaults.
+   * Handles corrupted data, schema changes, and storage errors gracefully.
+   * @returns {Object|null} - Valid state object or null to use defaults
+   */
+  loadFromStorage() {
     try {
       const saved = localStorage.getItem('ecoSphereState');
-      if (saved) {
-        this.state = JSON.parse(saved);
-        // Ensure all required fields exist in case structure changes
-        this.state.inputs = { ...DEFAULT_STATE.inputs, ...this.state.inputs };
-        this.state.oneClickActions = { ...DEFAULT_STATE.oneClickActions, ...this.state.oneClickActions };
-        this.state.scores = { ...DEFAULT_STATE.scores, ...this.state.scores };
-        if (!this.state.chatHistory) {
-          this.state.chatHistory = JSON.parse(JSON.stringify(DEFAULT_STATE.chatHistory));
-        }
-        if (!this.state.theme) {
-          this.state.theme = DEFAULT_STATE.theme;
-        }
-      } else {
-        this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
-        this.recalculate();
+      if (!saved) return null;
+
+      const parsed = JSON.parse(saved);
+      if (!this.isValidState(parsed)) {
+        console.warn('Invalid state structure in localStorage, using defaults');
+        return null;
       }
+
+      return this.mergeWithDefaults(parsed);
     } catch (e) {
-      console.warn("LocalStorage access failed. Using memory fallback.", e);
+      console.warn('Failed to load state from localStorage:', e);
+      return null;
+    }
+  },
+
+  /**
+   * Initializes the state, loading from localStorage if present.
+   * Falls back to default state on corruption, schema changes, or errors.
+   */
+  init() {
+    const loadedState = this.loadFromStorage();
+
+    if (loadedState) {
+      this.state = loadedState;
+    } else {
       this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
       this.recalculate();
     }
+
     this.notify();
   },
 
@@ -89,12 +132,18 @@ export const StateManager = {
 
   /**
    * Registers a subscriber callback function
-   * @param {Function} callback 
+   * @param {Function} callback
    */
   subscribe(callback) {
     this.listeners.push(callback);
     // Immediately execute callback with initial state
-    callback(this.state);
+    // If callback throws, remove it from listeners to prevent leak
+    try {
+      callback(this.state);
+    } catch (e) {
+      this.listeners = this.listeners.filter(l => l !== callback);
+      throw e;
+    }
     return () => {
       this.listeners = this.listeners.filter(l => l !== callback);
     };
@@ -177,5 +226,12 @@ export const StateManager = {
     this.state = JSON.parse(JSON.stringify(DEFAULT_STATE));
     this.recalculate();
     this.notify();
+  },
+
+  /**
+   * Clears all registered listeners (useful for testing)
+   */
+  clearListeners() {
+    this.listeners = [];
   }
 };
