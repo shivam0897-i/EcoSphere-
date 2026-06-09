@@ -79,4 +79,32 @@ describe('carbonCalculator', () => {
     const res = calculateFootprint({ transit: 50 }, { publicTransit: true });
     assert.strictEqual(res.transitScore, 6.0);
   });
+
+  test('should handle case-insensitive diet matching', () => {
+    const resVeganLower = calculateFootprint({ diet: 'vegan' });
+    const resVeganUpper = calculateFootprint({ diet: 'Vegan' });
+    const resVeganMixed = calculateFootprint({ diet: 'VeGaN' });
+    assert.strictEqual(resVeganLower.dietScore, 1.5);
+    assert.strictEqual(resVeganUpper.dietScore, 1.5);
+    assert.strictEqual(resVeganMixed.dietScore, 1.5);
+
+    const resVegLower = calculateFootprint({ diet: 'vegetarian' });
+    const resVegUpper = calculateFootprint({ diet: 'VEGETARIAN' });
+    assert.strictEqual(resVegLower.dietScore, 2.5);
+    assert.strictEqual(resVegUpper.dietScore, 2.5);
+  });
+
+  test('should calculate totalScore as sum of rounded components', () => {
+    // Test the specific case from the challenge report
+    const res = calculateFootprint(
+      { diet: 'omnivore', energy: 1, transit: 0 },
+      { meatlessMondays: true, greenEnergySwitch: true }
+    );
+    const sumOfComponents = parseFloat((res.dietScore + res.energyScore + res.transitScore).toFixed(2));
+    assert.strictEqual(res.totalScore, sumOfComponents);
+    assert.strictEqual(res.dietScore, 4.05);
+    assert.strictEqual(res.energyScore, 0.07);
+    assert.strictEqual(res.transitScore, 0);
+    assert.strictEqual(res.totalScore, 4.12);
+  });
 });

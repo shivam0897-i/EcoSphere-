@@ -13,9 +13,11 @@ export function calculateFootprint(inputs, actions = {}) {
   // Diet: Vegan (1.5), Vegetarian (2.5), Omnivore (4.5)
   let dietCoeff = 4.5;
   if (inputs && inputs.diet) {
-    if (inputs.diet === 'vegan') {
+    // Normalize diet input to lowercase for case-insensitive matching
+    const normalizedDiet = inputs.diet.toLowerCase();
+    if (normalizedDiet === 'vegan') {
       dietCoeff = 1.5;
-    } else if (inputs.diet === 'vegetarian') {
+    } else if (normalizedDiet === 'vegetarian') {
       dietCoeff = 2.5;
     }
   }
@@ -48,12 +50,18 @@ export function calculateFootprint(inputs, actions = {}) {
   }
   const transitScore = transitMultiplier;
 
-  const totalScore = parseFloat((dietScore + energyScore + transitScore).toFixed(2));
+  // Round individual components first
+  const roundedDietScore = parseFloat(dietScore.toFixed(2));
+  const roundedEnergyScore = parseFloat(energyScore.toFixed(2));
+  const roundedTransitScore = parseFloat(transitScore.toFixed(2));
+  
+  // Calculate total as sum of already-rounded components to match UI display
+  const totalScore = parseFloat((roundedDietScore + roundedEnergyScore + roundedTransitScore).toFixed(2));
 
   return {
-    dietScore: parseFloat(dietScore.toFixed(2)),
-    energyScore: parseFloat(energyScore.toFixed(2)),
-    transitScore: parseFloat(transitScore.toFixed(2)),
+    dietScore: roundedDietScore,
+    energyScore: roundedEnergyScore,
+    transitScore: roundedTransitScore,
     totalScore
   };
 }
