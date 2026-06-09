@@ -11,7 +11,7 @@ import { CARBON_COEFFICIENTS } from './constants.js';
  * @param {Object} [actions] - { greenEnergySwitch: bool, smartThermostat: bool, meatlessMondays: bool, publicTransit: bool }
  * @returns {Object} - { dietScore: num, energyScore: num, transitScore: num, totalScore: num }
  */
-export function calculateFootprint(inputs, actions) {
+export function calculateFootprint(inputs, actions = {}) {
   const { diet = 'omnivore', energy = 50, transit = 50 } = inputs || {};
   const { meatlessMondays = false, greenEnergySwitch = false, smartThermostat = false, publicTransit = false } = actions || {};
 
