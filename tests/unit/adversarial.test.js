@@ -99,7 +99,7 @@ describe('Adversarial & Edge-Case Tests', () => {
   });
 
   describe('StateManager Subscriber and State Robustness', () => {
-    test('leak vulnerability: subscribe callback throwing on initial execution remains in listeners', () => {
+    test('leak vulnerability: subscribe callback throwing on initial execution does not remain in listeners', () => {
       let runCount = 0;
       let errorThrown = false;
 
@@ -117,17 +117,17 @@ describe('Adversarial & Edge-Case Tests', () => {
       assert.ok(errorThrown);
       assert.strictEqual(runCount, 1);
 
-      // Verify that this callback was leaked inside listeners because subscribe threw before returning the unsubscribe fn!
-      assert.strictEqual(StateManager.listeners.length, 1);
+      // Verify that this callback was NOT leaked inside listeners because subscribe caught the error and filtered it out
+      assert.strictEqual(StateManager.listeners.length, 0);
 
-      // If we trigger an update, the leaked callback will run again during notify and throw again (caught by notify's try-catch)
+      // If we trigger an update, the callback should not run again
       let consoleErrorCalled = false;
       console.error = () => { consoleErrorCalled = true; };
 
       StateManager.updateInputs({ diet: 'vegan' });
 
-      assert.strictEqual(runCount, 2); // It ran again!
-      assert.ok(consoleErrorCalled); // Error was caught inside notify
+      assert.strictEqual(runCount, 1); // It did NOT run again!
+      assert.ok(!consoleErrorCalled); // No error logged
     });
 
     test('state corruption: UI crash vulnerability with null values in state scores', () => {
